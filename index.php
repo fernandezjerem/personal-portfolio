@@ -8,7 +8,11 @@
 <style>
 html {
     height: 100%;
-    cursor:url("assets/default_arrow.png"), auto;
+    cursor:url("assets/cursor.png"), auto;
+}
+
+window-interface {
+    background-color:rgba(255,255,255,1);
 }
 
 body {
@@ -42,6 +46,7 @@ ul {
     bottom: 0;
     width: 100%;
     align-items: center;
+    font-size: 75%;
 }
 ul li {
     display: flex;
@@ -60,14 +65,31 @@ ul li a {
 ul li a.active {
     background-color: #04AA6D;
 }*/
+ul li.rightPos {
+    margin-left: auto;
+    background-image: url("assets/ui/taskbarClock.png");
+    background-position: center;
+    background-size: 100% 100%;
+    padding: 4px;
+    align-self: stretch;
+    align-items: center;
+    display: flex;
+}
+ul li.rightPos a {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    color: white;
+}
 ul li.startButton {
-    font-family: "Franklin Gothic", sans-serif;
-    font-style: italic;
     background-image: url("assets/ui/startButton.png");
     background-position: center;
     background-size: 100% 100%;
     width: 6%;
-    height: 100%;
+    padding: 0%;
+    align-self: stretch;
+    align-items: center;
+    display: flex;
 }
 ul li.startButton:hover {
     background-image: url("assets/ui/startButtonHover.png");
@@ -76,21 +98,17 @@ ul li.startButton.active {
     background-image: url("assets/ui/startButtonActive.png");
 }
 ul li.startButton a {
+    font-family: "Franklin Gothic", sans-serif;
+    font-style: italic;
     display: flex;
     align-items: center;
+    height: 100%;
     justify-content: left;
     gap: 1px;
+    color: white;
     font-size: 1.25rem;
     overflow: hidden;
-}
-ul li.rightPos {
-    margin-left: auto;
-    background-image: url("assets/ui/taskbarClock.png");
-    background-position: center;
-    background-size: 100% 100%;
-    align-items: top;
-    height: 100%;
-    align-self: stretch;
+    text-shadow: 2px 2px 5px black;
 }
 ul li.windowTask {
     background-image: url("assets/ui/taskbarWindowInactive.png");
@@ -107,7 +125,7 @@ ul li.windowTask.active {
     background-image: url("assets/ui/taskbarWindowActive.png");
 }
 ul li.windowTask img {
-    height: 1rem;
+    height: 0.9rem;
     width: auto;
     flex-shrink: 0;
 }
@@ -129,6 +147,15 @@ ul li.windowTask a {
     <h6>Small text here</h6>
     <h3>Initial commit!</h3>
     <h5>This is a new line!</h5>
+    <window-interface
+        icon="butterflyIcon"
+        title="Introduction"
+        content="hi"></window-interface>
+    <window-interface
+        img="assets/butterflyIcon.png"
+        data-text="Your card validation code (CVC)
+        is an extra security feature — it is the last 3 or 4 numbers on the
+        back of your card."></window-interface>
     <ul class="taskbar">
     <li class="startButton">
         <a href="">
@@ -137,19 +164,19 @@ ul li.windowTask a {
     </li>
     <li class="windowTask">
         <a href="">
-        <img src="assets/ui/butterflyIcon.png">Home
+        <img src="assets/butterflyIcon.png">Introduction
         </a></li>
     <li class="windowTask">
         <a href="">
-        <img src="assets/ui/infoIcon.png">About Me
+        <img src="assets/infoIcon.png">About Me
         </a></li>
     <li class="windowTask">
         <a href="">
-        <img src="assets/ui/projectsIcon.png">Projects
+        <img src="assets/projectsIcon.png">Projects
         </a></li>
     <li class="windowTask">
         <a href="">
-        <img src="assets/ui/contactIcon.png">Contact
+        <img src="assets/contactIcon.png">Contact
         </a></li>
     <li class="rightPos"><a href=""><span id="clock">&nbsp;</span></a></li>
     </ul>
@@ -157,5 +184,95 @@ ul li.windowTask a {
 
 
     <script src="js/clock.js"></script>
+    <script>
+        class windowInterface extends HTMLElement {
+        //static observedAttributes = ["title","content"];
+            constructor() {
+                super();
+            }
+
+            connectedCallback() {
+                // Create a shadow root
+                const shadow = this.attachShadow({ mode: "open" });
+
+                // Create spans
+                const wrapper = document.createElement("span");
+                wrapper.setAttribute("class", "wrapper");
+
+                const icon = document.createElement("span");
+                icon.setAttribute("class", "icon");
+                icon.setAttribute("tabindex", 0);
+
+                const info = document.createElement("span");
+                info.setAttribute("class", "info");
+
+                // Take attribute content and put it inside the info span
+                const text = this.getAttribute("data-text");
+                info.textContent = text;
+
+                // Insert icon
+                let imgUrl;
+                if (this.hasAttribute("img")) {
+                imgUrl = this.getAttribute("img");
+                } else {
+                imgUrl = "img/default.png";
+                }
+
+                const img = document.createElement("img");
+                img.src = imgUrl;
+                icon.appendChild(img);
+
+                // Create some CSS to apply to the shadow dom
+                const style = document.createElement("style");
+                console.log(style.isConnected);
+
+                style.textContent = `
+                .wrapper {
+                    position: relative;
+                }
+
+                .info {
+                    font-size: 0.8rem;
+                    width: 200px;
+                    display: inline-block;
+                    border: 1px solid black;
+                    padding: 10px;
+                    background: white;
+                    border-radius: 10px;
+                    opacity: 0;
+                    transition: 0.6s all;
+                    position: absolute;
+                    bottom: 20px;
+                    left: 10px;
+                    z-index: 3;
+                }
+
+                img {
+                    width: 1.2rem;
+                }
+
+                .icon:hover + .info, .icon:focus + .info {
+                    opacity: 1;
+                }
+                `;
+
+                // Attach the created elements to the shadow dom
+                shadow.appendChild(style);
+                console.log(style.isConnected);
+                shadow.appendChild(wrapper);
+                wrapper.appendChild(icon);
+                wrapper.appendChild(info);
+            }
+
+
+            attributeChangedCallback(name, oldValue, newValue) {
+                console.log(
+                `Attribute ${name} has changed from ${oldValue} to ${newValue}.`,
+                );
+            }
+        // Element functionality written in here
+        }
+        customElements.define("window-interface", windowInterface);
+    </script>
 </body>
 </html>
