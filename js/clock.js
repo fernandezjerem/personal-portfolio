@@ -9,6 +9,7 @@ function updateClock(showSeconds)
   var currentMinutes = currentTime.getMinutes ( );
   var currentSeconds = currentTime.getSeconds ( );
   var currentTimeString = "";
+  var currentTimeStringWSeconds = "";
 
   // Pad the minutes and seconds with leading zeros, if required
   currentMinutes = ( currentMinutes < 10 ? "0" : "" ) + currentMinutes;
@@ -21,15 +22,16 @@ function updateClock(showSeconds)
 
   // Convert an hours component of "0" to "12"
   currentHours = ( currentHours == 0 ) ? 12 : currentHours;
+  currentSeconds = ( currentSeconds < 10 ? "0" : "" ) + currentSeconds;
 
   // Compose the string for display
   if(showSeconds) { 
-  currentSeconds = ( currentSeconds < 10 ? "0" : "" ) + currentSeconds;
   currentTimeString = currentHours + ":" + currentMinutes + ":" + currentSeconds + " " + timeOfDay;
   } else {
   currentTimeString = currentHours + ":" + currentMinutes + " " + timeOfDay;
   }
-
+  currentTimeStringWSeconds = currentHours + ":" + currentMinutes + ":" + currentSeconds + " " + timeOfDay;
   // Update the time display
   document.getElementById("clock").firstChild.nodeValue = currentTimeString;
+  //document.getElementById("clock").title = currentTimeStringWSeconds;
 }

@@ -12,7 +12,8 @@ html {
 }
 
 window-interface {
-    background-color:rgba(255,255,255,1);
+    /*background-color:rgba(255,255,255,1);*/
+    scale: 200%;
 }
 
 body {
@@ -65,7 +66,7 @@ ul li a {
 ul li a.active {
     background-color: #04AA6D;
 }*/
-ul li.rightPos {
+ul li#rightPos {
     margin-left: auto;
     background-image: url("assets/ui/taskbarClock.png");
     background-position: center;
@@ -75,7 +76,7 @@ ul li.rightPos {
     align-items: center;
     display: flex;
 }
-ul li.rightPos a {
+ul li#rightPos a {
     display: flex;
     align-items: center;
     height: 100%;
@@ -85,8 +86,8 @@ ul li.startButton {
     background-image: url("assets/ui/startButton.png");
     background-position: center;
     background-size: 100% 100%;
-    width: 6%;
-    padding: 0%;
+    width: 6vw;
+    padding: 0vw;
     align-self: stretch;
     align-items: center;
     display: flex;
@@ -111,18 +112,34 @@ ul li.startButton a {
     text-shadow: 2px 2px 5px black;
 }
 ul li.windowTask {
-    background-image: url("assets/ui/taskbarWindowInactive.png");
-    background-position: center;
-    background-size: 100% 100%;
+    /*background-image: url("assets/ui/taskbarWindowInactive.png");*/
+    border-image: url("assets/ui/taskbarWindowInactive.png") 50 round;
+    border-radius: 100%;
+    border-image-slice: 9 fill;
+    border-image-width: auto;
+    border-image-repeat: stretch;
+    /*background-position: center;
+    background-size: 100% 100%;*/
     height: 75%;
     display: inline-flex;
     align-items: center;
+    margin: 1px 0.01%;
 }
 ul li.windowTask:hover {
-    background-image: url("assets/ui/taskbarWindowHover.png");
+    /*background-image: url("assets/ui/taskbarWindowHover.png");*/
+    border-image: url("assets/ui/taskbarWindowHover.png") 50 round;
+    border-radius: 100%;
+    border-image-slice: 9 fill;
+    border-image-width: auto;
+    border-image-repeat: stretch;
 }
 ul li.windowTask.active {
-    background-image: url("assets/ui/taskbarWindowActive.png");
+    /*background-image: url("assets/ui/taskbarWindowActive.png");*/
+    border-image: url("assets/ui/taskbarWindowActive.png") 50 round;
+    border-radius: 100%;
+    border-image-slice: 9 fill;
+    border-image-width: auto;
+    border-image-repeat: stretch;
 }
 ul li.windowTask img {
     height: 0.9rem;
@@ -141,12 +158,13 @@ ul li.windowTask a {
 }
 
 </style>
-<body class="wallpaper" onload="updateClock(false); setInterval('updateClock()', 1000 )">
-    <h1>Hi! This should have a BLUE gutter now.</h1>
+<body class="wallpaper" onload="updateClock(false); setInterval('updateClock(false)', 1000 )">
+    <!--<h1>Hi! This should have a BLUE gutter now.</h1>
     <p>Testing Github for CIT.010! (lol)</p>
     <h6>Small text here</h6>
     <h3>Initial commit!</h3>
-    <h5>This is a new line!</h5>
+    <h5>This is a new line!</h5>-->
+    <br>
     <window-interface
         icon="butterflyIcon"
         title="Introduction"
@@ -156,6 +174,18 @@ ul li.windowTask a {
         data-text="Your card validation code (CVC)
         is an extra security feature — it is the last 3 or 4 numbers on the
         back of your card."></window-interface>
+
+
+    <actual-window
+        posX="100px"
+        posY="100px"
+        height=""
+        width="10vw"
+        icon="assets/butterflyIcon.png"
+        title="Introduction"
+        content="Hello">
+    </actual-window>
+
     <ul class="taskbar">
     <li class="startButton">
         <a href="">
@@ -178,12 +208,22 @@ ul li.windowTask a {
         <a href="">
         <img src="assets/contactIcon.png">Contact
         </a></li>
-    <li class="rightPos"><a href=""><span id="clock">&nbsp;</span></a></li>
+    <li id="rightPos"><a href=""><span id="clock">&nbsp;</span></a></li>
     </ul>
 
 
 
     <script src="js/clock.js"></script>
+    <script>
+        const date = new Date();
+        const options = {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric"
+        };
+        document.getElementById("rightPos").title = date.toLocaleDateString("en-US", options);
+    </script>
     <script>
         class windowInterface extends HTMLElement {
         //static observedAttributes = ["title","content"];
@@ -215,7 +255,7 @@ ul li.windowTask a {
                 if (this.hasAttribute("img")) {
                 imgUrl = this.getAttribute("img");
                 } else {
-                imgUrl = "img/default.png";
+                imgUrl = "assets/unknownIcon.png";
                 }
 
                 const img = document.createElement("img");
@@ -245,10 +285,12 @@ ul li.windowTask a {
                     bottom: 20px;
                     left: 10px;
                     z-index: 3;
+                    color: black;
                 }
 
                 img {
                     width: 1.2rem;
+                    height: 1.2rem;
                 }
 
                 .icon:hover + .info, .icon:focus + .info {
@@ -273,6 +315,114 @@ ul li.windowTask a {
         // Element functionality written in here
         }
         customElements.define("window-interface", windowInterface);
+    </script>
+    <script>
+        class actualWindow extends HTMLElement {
+            constructor() {
+                super();
+            }
+
+            connectedCallback() {
+                const shadow = this.attachShadow({ mode: "open" });
+
+                const wrapper = document.createElement("span");
+                wrapper.setAttribute("class", "wrapper");
+
+                const icon = document.createElement("span");
+                icon.setAttribute("class", "icon");
+                icon.setAttribute("tabindex", 0);
+
+                const info = document.createElement("span");
+                info.setAttribute("class", "info");
+
+                const text = this.getAttribute("content");
+                info.textContent = text;
+
+                const getThese=["posX","posY","height","width"];
+                let theValues=["0px","0px","","200px"];
+                for(let i=0;i<4;i++){
+                    if (this.hasAttribute(getThese[i])) {
+                        theValues[i] = this.getAttribute(getThese[i]);
+                    }
+                    console.log(getThese[i]+'='+theValues[i]);
+                };
+
+                // Insert icon
+                let imgUrl;
+                if (this.hasAttribute("icon")) {
+                    imgUrl = this.getAttribute("icon");
+                } else {
+                    imgUrl = "assets/unknownIcon.png";
+                }
+
+                const img = document.createElement("img");
+                img.src = imgUrl;
+                icon.appendChild(img);
+
+                // Create some CSS to apply to the shadow dom
+                const style = document.createElement("style");
+                console.log(style.isConnected);
+
+                style.textContent = `
+                :root{
+                --posX: calc(100vw-`+theValues[0]+`);
+                --posY: calc(100vh-`+theValues[1]+`);
+                --scaleHeight: calc(100vh-`+theValues[2]+`);
+                --scaleWidth: calc(100vw-`+theValues[3]+`);
+                }
+                .wrapper {
+                }
+
+                .info {
+                    font-size: 0.8rem;
+                    width: var(--scaleWidth);
+                    display: inline-block;
+                    padding: `+theValues[2]+` `+theValues[3]+`;
+                    /*padding: 10px 10px;*/
+                    background-color: rgba(239,238,224,1);
+                    opacity: 1;
+                    /*transition: 0.6s all;*/
+                    position: absolute;
+                    top: var(--posX);
+                    left: var(--posY);
+                    z-index: 3;
+                    color: black;
+                    overflow: hidden;
+                    border: 20px solid black;
+                    border-radius: 15px;
+                    border-image: url("assets/ui/frames.png") 50 round;
+                    border-image-slice: 30;
+                    border-image-width: 10px;
+                    border-image-repeat: stretch;
+                }
+
+                img {
+                    width: 1.2rem;
+                    height: 1.2rem;
+                }
+
+                .icon:hover + .info, .icon:focus + .info {
+                    opacity: 0;
+                }
+                `;
+
+                // Attach the created elements to the shadow dom
+                shadow.appendChild(style);
+                console.log(style.isConnected);
+                shadow.appendChild(wrapper);
+                wrapper.appendChild(icon);
+                wrapper.appendChild(info);
+            }
+
+
+            attributeChangedCallback(name, oldValue, newValue) {
+                console.log(
+                `Attribute ${name} has changed from ${oldValue} to ${newValue}.`,
+                );
+            }
+        // Element functionality written in here
+        }
+        customElements.define("actual-window", actualWindow);
     </script>
 </body>
 </html>
