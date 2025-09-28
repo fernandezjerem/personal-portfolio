@@ -12,7 +12,6 @@ html {
 }
 
 window-interface {
-    /*background-color:rgba(255,255,255,1);*/
     scale: 200%;
 }
 
@@ -174,16 +173,65 @@ ul li.windowTask a {
         data-text="Your card validation code (CVC)
         is an extra security feature — it is the last 3 or 4 numbers on the
         back of your card."></window-interface>
-
-
+<!-- INTRODUCTION PART LOL -->
     <actual-window
+        windowTitle="Introduction"
+        taskbar="introTaskbar"
+        icon="assets/butterflyIcon.png"
         posX="100px"
         posY="100px"
         height=""
-        width="10vw"
-        icon="assets/butterflyIcon.png"
-        title="Introduction"
-        content="Hello">
+        width="5vw"
+        content=""
+    >
+    Hi!<br>
+    Welcome to my personal portfolio!<br>
+    Lol!
+    </actual-window>
+<!-- ABOUT ME -->
+    <actual-window
+        windowTitle="About Me"
+        taskbar="aboutMeTaskbar"
+        icon="assets/infoIcon.png"
+        posX="400px"
+        posY="400px"
+        height=""
+        width="5vw"
+        content=""
+    >
+    lallala<br>
+    hihihi<br>
+    lalalalala
+    </actual-window>
+<!-- PROJECTS -->
+    <actual-window
+        windowTitle="Projects"
+        taskbar="projectsTaskbar"
+        icon="assets/projectsIcon.png"
+        posX="700px"
+        posY="300px"
+        height=""
+        width="3vw"
+        content=""
+    >
+    blablabla<br>
+    idk geallian rey website<br>
+    etc
+    </actual-window>
+<!-- CONTACT -->
+    <actual-window
+        windowTitle="Contact"
+        taskbar="contactTaskbar"
+        icon="assets/contactIcon.png"
+        posX="1100px"
+        posY="200px"
+        height=""
+        width="3vw"
+        content=""
+    >
+    github @fernandezjerem<br>
+    gmail miah.fernandez4@gmail.com<br>
+    hatdog
     </actual-window>
 
     <ul class="taskbar">
@@ -192,19 +240,19 @@ ul li.windowTask a {
         <img src="assets/ui/WindowsLogo-small.png">start
         </a>
     </li>
-    <li class="windowTask">
+    <li class="windowTask" id="introTaskbar">
         <a href="">
         <img src="assets/butterflyIcon.png">Introduction
         </a></li>
-    <li class="windowTask">
+    <li class="windowTask" id="aboutMeTaskbar">
         <a href="">
         <img src="assets/infoIcon.png">About Me
         </a></li>
-    <li class="windowTask">
+    <li class="windowTask" id="projectsTaskbar">
         <a href="">
         <img src="assets/projectsIcon.png">Projects
         </a></li>
-    <li class="windowTask">
+    <li class="windowTask" id="contactTaskbar">
         <a href="">
         <img src="assets/contactIcon.png">Contact
         </a></li>
@@ -289,8 +337,9 @@ ul li.windowTask a {
                 }
 
                 img {
-                    width: 1.2rem;
-                    height: 1.2rem;
+                    width: 1.5rem;
+                    height: 1.5rem;
+                    padding: 0.5%;
                 }
 
                 .icon:hover + .info, .icon:focus + .info {
@@ -325,6 +374,8 @@ ul li.windowTask a {
             connectedCallback() {
                 const shadow = this.attachShadow({ mode: "open" });
 
+                const windowName = this.getAttribute("windowTitle");
+
                 const wrapper = document.createElement("span");
                 wrapper.setAttribute("class", "wrapper");
 
@@ -337,36 +388,48 @@ ul li.windowTask a {
 
                 const text = this.getAttribute("content");
                 info.textContent = text;
+                const slot = document.createElement("slot");
+                info.appendChild(slot);
 
                 const getThese=["posX","posY","height","width"];
                 let theValues=["0px","0px","","200px"];
+
+                // Insert icon
+                let imgUrl;
+                if (this.hasAttribute("icon")) {
+                    imgUrl = this.getAttribute("icon");
+                    const img = document.createElement("img");
+                    img.src = imgUrl;
+                    icon.appendChild(img);
+                }// else {
+                //    imgUrl = "assets/unknownIcon.png";}
+
+                // Create some CSS to apply to the shadow dom
+                const style = document.createElement("style");
+                console.log(style.isConnected);
+                
+                console.log(windowName+" Values");
                 for(let i=0;i<4;i++){
                     if (this.hasAttribute(getThese[i])) {
                         theValues[i] = this.getAttribute(getThese[i]);
                     }
                     console.log(getThese[i]+'='+theValues[i]);
                 };
+                let convertIntoView=[1600,800,'w','h'];
+                for(let i=0;i<2;i++){ // CONVERT INTO VIEWPORT
+                    if(theValues[i].includes("px")) {
+                        let temp = theValues[i].replace("px","");
+                        theValues[i] = (temp/convertIntoView[i])*100;
+                        theValues[i] = ""+theValues[i]+"v"+convertIntoView[i+2]
+                        console.log(getThese[i]+" "+temp+"px converted into "+theValues[i]+" Values");
+                    }
+                };
 
-                // Insert icon
-                let imgUrl;
-                if (this.hasAttribute("icon")) {
-                    imgUrl = this.getAttribute("icon");
-                } else {
-                    imgUrl = "assets/unknownIcon.png";
-                }
-
-                const img = document.createElement("img");
-                img.src = imgUrl;
-                icon.appendChild(img);
-
-                // Create some CSS to apply to the shadow dom
-                const style = document.createElement("style");
-                console.log(style.isConnected);
-
+                // debug
                 style.textContent = `
                 :root{
-                --posX: calc(100vw-`+theValues[0]+`);
-                --posY: calc(100vh-`+theValues[1]+`);
+                --posX: calc(0+`+theValues[0]+`);
+                --posY: calc(0+`+theValues[1]+`);
                 --scaleHeight: calc(100vh-`+theValues[2]+`);
                 --scaleWidth: calc(100vw-`+theValues[3]+`);
                 }
@@ -378,31 +441,41 @@ ul li.windowTask a {
                     width: var(--scaleWidth);
                     display: inline-block;
                     padding: `+theValues[2]+` `+theValues[3]+`;
-                    /*padding: 10px 10px;*/
+                    /*padding: 10px;*/
                     background-color: rgba(239,238,224,1);
-                    opacity: 1;
                     /*transition: 0.6s all;*/
                     position: absolute;
-                    top: var(--posX);
-                    left: var(--posY);
+                    /*top: var(--posX);
+                    left: var(--posY);*/
+                    left: `+theValues[0]+`;
+                    top: `+theValues[1]+`;
                     z-index: 3;
                     color: black;
                     overflow: hidden;
                     border: 20px solid black;
-                    border-radius: 15px;
+                    border-radius: 100%;
                     border-image: url("assets/ui/frames.png") 50 round;
-                    border-image-slice: 30;
-                    border-image-width: 10px;
+                    border-image-slice: 22 fill;
+                    border-image-width: auto;
                     border-image-repeat: stretch;
+                    opacity: 0;
                 }
 
                 img {
-                    width: 1.2rem;
-                    height: 1.2rem;
+                    z-index: 4;
+                    width: 1.5rem;
+                    height: 1.5rem;
+                    left: `+theValues[0]+`;
+                    top: `+theValues[1]+`;
+                    position: absolute;
+                    opacity: 0;
                 }
 
-                .icon:hover + .info, .icon:focus + .info {
-                    opacity: 0;
+                /*.icon:hover + .info,*/
+                .icon:focus + .info,
+                :host(.active) .info,
+                :host(.active) img {
+                    opacity: 1;
                 }
                 `;
 
@@ -412,6 +485,26 @@ ul li.windowTask a {
                 shadow.appendChild(wrapper);
                 wrapper.appendChild(icon);
                 wrapper.appendChild(info);
+                const whichTaskbar = this.getAttribute("taskbar");
+                const taskbarName = document.getElementById(whichTaskbar)
+                taskbarName.addEventListener("click", (event) => {
+                    event.preventDefault();
+                    document.querySelectorAll(".windowTask.active").forEach(activeTask => {
+                        if (activeTask !== taskbarName) activeTask.classList.remove("active");
+                    });
+                    taskbarName.classList.toggle("active");
+                    if (taskbarName.classList.contains("active")) {
+                        this.classList.add("active");   // add to <actual-window>
+                    } else {
+                        this.classList.remove("active");
+                    }
+                });
+                icon.addEventListener("focus", () => {
+                taskbarName.classList.add("active");
+                });
+                icon.addEventListener("blur", () => {
+                taskbarName.classList.remove("active");
+                });
             }
 
 
